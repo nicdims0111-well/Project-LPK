@@ -214,45 +214,36 @@ elif menu == "🛠 Tools":
     with tab2:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.markdown("### 🍏 Food Nano-Converter")
-        st.write("Ubah ukuran material pangan ke skala nanometer untuk melihat perubahan sifatnya.")
+        st.write("Simulasi perubahan sifat atom saat dikonversi ke skala nanometer.")
 
-        # 1. Pilihan Material Pangan
-        material = st.selectbox("Pilih Material Nano Pangan:", 
-                                ["Silver (Antimikroba)", "Gold (Biosensor)", "Silika (Anti-kempal)", "Zat Besi (Fortifikasi)"])
+        # Pilihan Material Berbasis Pangan
+        material = st.selectbox("Pilih Material:", ["Silver (Ag)", "Gold (Au)", "Iron (Fe)", "Silika (SiO2)"])
 
-        # 2. Slider Ukuran (dari 1000nm ke 1nm)
+        # Slider Skala Nanometer
         st.write("---")
-        st.write("#### 📏 Geser untuk Mengecilkan Ukuran:")
-        size = st.slider("Ukuran Partikel (Nanometer)", min_value=1, max_value=1000, value=1000)
+        size = st.slider("Ukuran Partikel (nm):", min_value=1, max_value=1000, value=1000)
 
-        # 3. Logika Perubahan Sifat
-        st.write(f"### Status Material pada {size} nm:")
+        # Logika Perubahan Sifat Atom
+        st.write(f"#### Hasil Analisis pada {size} nm:")
         
-        if size > 500:
-            st.info("📦 **Sifat Makro:** Material stabil, warna standar, reaktivitas rendah. Digunakan dalam bentuk curah.")
-        elif 100 < size <= 500:
-            st.warning("🔍 **Sifat Transisi:** Luas permukaan mulai meningkat. Kelarutan dalam air mulai membaik.")
+        if size > 100:
+            st.info("📦 **Sifat Makro:** Material bertindak sebagai material curah (bulk). Reaktivitas rendah.")
         else:
-            st.error("✨ **SIFAT NANO AKTIF:**")
+            st.error("✨ **Sifat Nano Aktif:**")
+            # Rasio luas permukaan (Surface-to-Volume Ratio) meningkat drastis
+            # Rumus sederhana: $6/D$ (untuk bola)
+            ratio = 6 / size 
+            st.metric(label="Rasio Luas Permukaan : Volume", value=f"{ratio:.2f}")
             
-            # Detail Sifat Nano Spesifik
-            if material == "Silver (Antimikroba)":
-                st.write("* **Sifat:** Menjadi agen antibakteri yang sangat kuat untuk kemasan pangan.")
-                st.write("* **Warna:** Berubah menjadi kuning tua/coklat karena efek *Surface Plasmon Resonance*.")
-            elif material == "Gold (Biosensor)":
-                st.write("* **Sifat:** Sangat reaktif secara katalitik. Digunakan untuk mendeteksi bakteri pada makanan.")
-                st.write("* **Warna:** Berubah dari kuning emas menjadi merah anggur.")
-            elif material == "Silika (Anti-kempal)":
-                st.write("* **Sifat:** Memiliki daya serap air yang sangat tinggi (hidrofobik/hidrofilik ekstrem).")
-            elif material == "Zat Besi (Fortifikasi)":
-                st.write("* **Sifat:** Bioavailabilitas meningkat drastis (lebih mudah diserap tubuh manusia).")
+            if material == "Silver (Ag)":
+                st.write("**Efek:** Daya hambat bakteri (antibakteri) meningkat drastis karena luas permukaan kontak dengan dinding sel mikroba lebih besar.")
+            elif material == "Gold (Au)":
+                st.write("**Efek:** Warna berubah dari keemasan menjadi merah/ungu karena efek *Localized Surface Plasmon Resonance* (LSPR).")
+            elif material == "Iron (Fe)":
+                st.write("**Efek:** Kelarutan dan bioavailabilitas dalam tubuh meningkat, sangat efektif untuk fortifikasi pangan.")
+            elif material == "Silika (SiO2)":
+                st.write("**Efek:** Luas permukaan yang besar membuatnya sangat efektif sebagai zat anti-kempal (anti-caking agent).")
 
-            # Kalkulasi Ilmiah Sederhana (Surface-to-Volume Ratio)
-            # Rumus: 3 / radius
-            ratio = 3 / (size / 2)
-            st.metric(label="Rasio Luas Permukaan : Volume", value=f"{ratio:.4f}")
-            st.caption("Semakin tinggi rasio ini, semakin reaktif material tersebut.")
-        
         st.markdown("</div>", unsafe_allow_html=True)
 
 elif menu == "👥 About":
