@@ -1,24 +1,139 @@
 import streamlit as st
-import math
-import pandas as pd # Perlu import pandas untuk grafik dummy
-import numpy as np  # Perlu import numpy untuk grafik dummy
+import pandas as pd
+import numpy as np
+
+# ==========================================
+# 1. DATABASE 118 UNSUR & LINK MSDS PUBCHEM
+# ==========================================
+# Database lengkap untuk mendukung fitur di menu Tools
+ELEMENTS = {
+    "Hydrogen": {"Sym": "H", "No": 1, "CID": "783"},
+    "Helium": {"Sym": "He", "No": 2, "CID": "23987"},
+    "Lithium": {"Sym": "Li", "No": 3, "CID": "3028194"},
+    "Beryllium": {"Sym": "Be", "No": 4, "CID": "5460467"},
+    "Boron": {"Sym": "B", "No": 5, "CID": "5462311"},
+    "Carbon": {"Sym": "C", "No": 6, "CID": "5462310"},
+    "Nitrogen": {"Sym": "N", "No": 7, "CID": "947"},
+    "Oxygen": {"Sym": "O", "No": 8, "CID": "977"},
+    "Fluorine": {"Sym": "F", "No": 9, "CID": "24524"},
+    "Neon": {"Sym": "Ne", "No": 10, "CID": "23935"},
+    "Sodium": {"Sym": "Na", "No": 11, "CID": "5360545"},
+    "Magnesium": {"Sym": "Mg", "No": 12, "CID": "5462224"},
+    "Aluminum": {"Sym": "Al", "No": 13, "CID": "5359268"},
+    "Silicon": {"Sym": "Si", "No": 14, "CID": "5461123"},
+    "Phosphorus": {"Sym": "P", "No": 15, "CID": "5462309"},
+    "Sulfur": {"Sym": "S", "No": 16, "CID": "5362487"},
+    "Chlorine": {"Sym": "Cl", "No": 17, "CID": "24526"},
+    "Argon": {"Sym": "Ar", "No": 18, "CID": "23968"},
+    "Potassium": {"Sym": "K", "No": 19, "CID": "5462222"},
+    "Calcium": {"Sym": "Ca", "No": 20, "CID": "5460341"},
+    "Scandium": {"Sym": "Sc", "No": 21, "CID": "5460340"},
+    "Titanium": {"Sym": "Ti", "No": 22, "CID": "23963"},
+    "Vanadium": {"Sym": "V", "No": 23, "CID": "23990"},
+    "Chromium": {"Sym": "Cr", "No": 24, "CID": "23976"},
+    "Manganese": {"Sym": "Mn", "No": 25, "CID": "23930"},
+    "Iron": {"Sym": "Fe", "No": 26, "CID": "23925"},
+    "Cobalt": {"Sym": "Co", "No": 27, "CID": "104730"},
+    "Nickel": {"Sym": "Ni", "No": 28, "CID": "935"},
+    "Copper": {"Sym": "Cu", "No": 29, "CID": "23978"},
+    "Zinc": {"Sym": "Zn", "No": 30, "CID": "23994"},
+    "Gallium": {"Sym": "Ga", "No": 31, "CID": "5360835"},
+    "Germanium": {"Sym": "Ge", "No": 32, "CID": "5460715"},
+    "Arsenic": {"Sym": "As", "No": 33, "CID": "5359596"},
+    "Selenium": {"Sym": "Se", "No": 34, "CID": "5360372"},
+    "Bromine": {"Sym": "Br", "No": 35, "CID": "24408"},
+    "Krypton": {"Sym": "Kr", "No": 36, "CID": "23991"},
+    "Rubidium": {"Sym": "Rb", "No": 37, "CID": "5462223"},
+    "Strontium": {"Sym": "Sr", "No": 38, "CID": "5460339"},
+    "Yttrium": {"Sym": "Y", "No": 39, "CID": "5460338"},
+    "Zirconium": {"Sym": "Zr", "No": 40, "CID": "23995"},
+    "Niobium": {"Sym": "Nb", "No": 41, "CID": "23934"},
+    "Molybdenum": {"Sym": "Mo", "No": 42, "CID": "23932"},
+    "Technetium": {"Sym": "Tc", "No": 43, "CID": "23959"},
+    "Ruthenium": {"Sym": "Ru", "No": 44, "CID": "23955"},
+    "Rhodium": {"Sym": "Rh", "No": 45, "CID": "23954"},
+    "Palladium": {"Sym": "Pd", "No": 46, "CID": "23938"},
+    "Silver": {"Sym": "Ag", "No": 47, "CID": "23954"},
+    "Cadmium": {"Sym": "Cd", "No": 48, "CID": "23973"},
+    "Indium": {"Sym": "In", "No": 49, "CID": "5360965"},
+    "Tin": {"Sym": "Sn", "No": 50, "CID": "5352426"},
+    "Antimony": {"Sym": "Sb", "No": 51, "CID": "5354495"},
+    "Tellurium": {"Sym": "Te", "No": 52, "CID": "5362488"},
+    "Iodine": {"Sym": "I", "No": 53, "CID": "24442"},
+    "Xenon": {"Sym": "Xe", "No": 54, "CID": "23993"},
+    "Cesium": {"Sym": "Cs", "No": 55, "CID": "5462221"},
+    "Barium": {"Sym": "Ba", "No": 56, "CID": "5460337"},
+    "Lanthanum": {"Sym": "La", "No": 57, "CID": "5460336"},
+    "Cerium": {"Sym": "Ce", "No": 58, "CID": "5460335"},
+    "Praseodymium": {"Sym": "Pr", "No": 59, "CID": "5460334"},
+    "Neodymium": {"Sym": "Nd", "No": 60, "CID": "5460333"},
+    "Promethium": {"Sym": "Pm", "No": 61, "CID": "5460332"},
+    "Samarium": {"Sym": "Sm", "No": 62, "CID": "5460331"},
+    "Europium": {"Sym": "Eu", "No": 63, "CID": "5460330"},
+    "Gadolinium": {"Sym": "Gd", "No": 64, "CID": "5460329"},
+    "Terbium": {"Sym": "Tb", "No": 65, "CID": "5460328"},
+    "Dysprosium": {"Sym": "Dy", "No": 66, "CID": "5460327"},
+    "Holmium": {"Sym": "Ho", "No": 67, "CID": "5460326"},
+    "Erbium": {"Sym": "Er", "No": 68, "CID": "5460325"},
+    "Thulium": {"Sym": "Tm", "No": 69, "CID": "5460324"},
+    "Ytterbium": {"Sym": "Yb", "No": 70, "CID": "5460323"},
+    "Lutetium": {"Sym": "Lu", "No": 71, "CID": "5460322"},
+    "Hafnium": {"Sym": "Hf", "No": 72, "CID": "23986"},
+    "Tantalum": {"Sym": "Ta", "No": 73, "CID": "23958"},
+    "Tungsten": {"Sym": "W", "No": 74, "CID": "23966"},
+    "Rhenium": {"Sym": "Re", "No": 75, "CID": "23953"},
+    "Osmium": {"Sym": "Os", "No": 76, "CID": "23937"},
+    "Iridium": {"Sym": "Ir", "No": 77, "CID": "23924"},
+    "Platinum": {"Sym": "Pt", "No": 78, "CID": "23939"},
+    "Gold": {"Sym": "Au", "No": 79, "CID": "23985"},
+    "Mercury": {"Sym": "Hg", "No": 80, "CID": "23931"},
+    "Thallium": {"Sym": "Tl", "No": 81, "CID": "5362544"},
+    "Lead": {"Sym": "Pb", "No": 82, "CID": "5352425"},
+    "Bismuth": {"Sym": "Bi", "No": 83, "CID": "5352424"},
+    "Polonium": {"Sym": "Po", "No": 84, "CID": "5460677"},
+    "Astatine": {"Sym": "At", "No": 85, "CID": "5460492"},
+    "Radon": {"Sym": "Rn", "No": 86, "CID": "23952"},
+    "Francium": {"Sym": "Fr", "No": 87, "CID": "5462220"},
+    "Radium": {"Sym": "Ra", "No": 88, "CID": "5460331"},
+    "Actinium": {"Sym": "Ac", "No": 89, "CID": "5460330"},
+    "Thorium": {"Sym": "Th", "No": 90, "CID": "5359306"},
+    "Protactinium": {"Sym": "Pa", "No": 91, "CID": "5460424"},
+    "Uranium": {"Sym": "U", "No": 92, "CID": "23967"},
+    "Neptunium": {"Sym": "Np", "No": 93, "CID": "23936"},
+    "Plutonium": {"Sym": "Pu", "No": 94, "CID": "23940"},
+    "Americium": {"Sym": "Am", "No": 95, "CID": "23969"},
+    "Curium": {"Sym": "Cm", "No": 96, "CID": "23977"},
+    "Berkelium": {"Sym": "Bk", "No": 97, "CID": "23970"},
+    "Californium": {"Sym": "Cf", "No": 98, "CID": "23974"},
+    "Einsteinium": {"Sym": "Es", "No": 99, "CID": "23979"},
+    "Fermium": {"Sym": "Fm", "No": 100, "CID": "23980"},
+    "Mendelevium": {"Sym": "Md", "No": 101, "CID": "23933"},
+    "Nobelium": {"Sym": "No", "No": 102, "CID": "23992"},
+    "Lawrencium": {"Sym": "Lr", "No": 103, "CID": "23926"},
+    "Rutherfordium": {"Sym": "Rf", "No": 104, "CID": "23956"},
+    "Dubnium": {"Sym": "Db", "No": 105, "CID": "23921"},
+    "Seaborgium": {"Sym": "Sg", "No": 106, "CID": "23957"},
+    "Bohrium": {"Sym": "Bh", "No": 107, "CID": "23971"},
+    "Hassium": {"Sym": "Hs", "No": 108, "CID": "23988"},
+    "Meitnerium": {"Sym": "Mt", "No": 109, "CID": "23929"},
+    "Darmstadtium": {"Sym": "Ds", "No": 110, "CID": "23920"},
+    "Roentgenium": {"Sym": "Rg", "No": 111, "CID": "23951"},
+    "Copernicium": {"Sym": "Cn", "No": 112, "CID": "23927"},
+    "Nihonium": {"Sym": "Nh", "No": 113, "CID": "135246755"},
+    "Flerovium": {"Sym": "Fl", "No": 114, "CID": "135246756"},
+    "Moscovium": {"Sym": "Mc", "No": 115, "CID": "135246757"},
+    "Livermorium": {"Sym": "Lv", "No": 116, "CID": "135246758"},
+    "Tennessine": {"Sym": "Ts", "No": 117, "CID": "135246759"},
+    "Oganesson": {"Sym": "Og", "No": 118, "CID": "135246760"},
+}
 
 # =============================
-# KONFIGURASI HALAMAN
+# 2. KONFIGURASI HALAMAN & CSS
 # =============================
-st.set_page_config(
-    page_title="NanoTools",
-    page_icon="🧬",
-    layout="centered",
-    initial_sidebar_state="expanded"
-)
+st.set_page_config(page_title="NanoTools Pro", page_icon="🧬", layout="centered")
 
-# =============================
-# CSS CUSTOM THEME & BACKGROUND
-# =============================
 st.markdown("""
 <style>
-/* Background & Animasi */
 .stApp {
     background: linear-gradient(-45deg, #360185, #8F0177, #DE1A58, #F4B342);
     background-size: 400% 400%;
@@ -29,196 +144,132 @@ st.markdown("""
     50% {background-position: 100% 50%;}
     100% {background-position: 0% 50%;}
 }
-/* Card Style */
-div.css-1r6slb0.e1tzin5v2 {
-    background-color: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
 .card {
-    background: rgba(255, 255, 255, 0.85);
-    padding: 25px;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    margin-bottom: 25px;
-}
-.card-header {
-    color: #360185;
-    font-weight: bold;
-    font-size: 1.3rem;
-    margin-bottom: 15px;
-    border-bottom: 2px solid #DE1A58;
-    padding-bottom: 5px;
-}
-/* Typography */
-h1, h2, h3 {
-    color: #ffffff !important;
-    text-shadow: 2px 2px 4px #000000;
-    text-align: center;
-}
-/* Button */
-.stButton>button {
-    background-color: #360185;
-    color: white;
-    border-radius: 10px;
-    width: 100%;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 15px;
+    color: #333;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 </style>
 """, unsafe_allow_html=True)
 
 # =============================
-# HEADER APLIKASI
-# =============================
-st.markdown("<h1>🧬 NanoTools <span style='color:#F4B342'>Pro</span></h1>", unsafe_allow_html=True)
-st.markdown("<h3>Integrated System for Nanotech & Food Science</h3>", unsafe_allow_html=True)
-st.markdown("---")
-
-# =============================
-# FUNGSI UTILITAS
-# =============================
-def make_card_start():
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-
-def make_card_end():
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# =============================
-# SIDEBAR (NAVIGASI DIPERBAIKI)
+# 3. SIDEBAR & NAVIGASI
 # =============================
 with st.sidebar:
-    st.image("https://cdn-icons-png.flaticon.com/512/3053/3053984.png", width=100)
-    st.title("Navigasi")
-    
-    # PERBAIKAN 1: Menambahkan semua opsi menu ke dalam list ini
-    menu = st.radio(
-        "Pilih Modul:",
-        [
-            "📈 Insight",
-            "🔬 Lab Nanoteknologi", 
-            "🛠 Tools",  
-            "👤 About"
-        ]
-    )
-    
-    st.markdown("---")
-    st.info("Aplikasi formulasi nano-emulsi dan estimasi gizi pangan.")
+    st.title("Menu Utama")
+    menu = st.radio("Pilih Modul:", ["📈 Insight", "🔬 Lab Nanoteknologi", "🛠 Tools", "👥 About"])
 
 # =============================
-# LOGIKA HALAMAN (IF - ELIF)
+# 4. LOGIKA HALAMAN UTAMA
 # =============================
+st.markdown("<h1 style='text-align:center; color:white;'>🧬 NanoTools Pro</h1>", unsafe_allow_html=True)
 
-# 1. MENU INSIGHT
 if menu == "📈 Insight":
-    st.title("🔬 Nanoparticle Insight")
-    st.write("Data tren penelitian nanoteknologi terkini.")
-    # Contoh grafik dummy
-    chart_data = pd.DataFrame(np.random.randn(20, 3), columns=['A', 'B', 'C'])
-    st.line_chart(chart_data)
+    st.subheader("📊 Research Insight")
+    st.line_chart(pd.DataFrame(np.random.randn(20, 2), columns=['Nano-A', 'Nano-B']))
 
-
-# 2. MODUL NANOTEKNOLOGI
 elif menu == "🔬 Lab Nanoteknologi":
-    st.markdown("## 🧪 Perhitungan Laboratorium")
-    
-    # Kalkulator Molaritas
-    make_card_start()
-    st.markdown("<div class='card-header'>⚖️ Kalkulator Molaritas</div>", unsafe_allow_html=True)
-    col1, col2 = st.columns(2)
-    with col1:
-        molaritas = st.number_input("Molaritas (M)", 0.0, step=0.1)
-        volume_l = st.number_input("Volume (Liter)", 0.0, step=0.1)
-    with col2:
-        mr = st.number_input("Berat Molekul (MR)", 0.0, step=0.1)
-    if st.button("Hitung Massa"):
-        st.success(f"Massa: **{molaritas * volume_l * mr:.4f} gram**")
-    make_card_end()
+    st.subheader("🧪 Kalkulator Molaritas")
+    # Logika untuk menghitung massa (gram) berdasarkan input pengguna
+    m = st.number_input("Molaritas (M)", min_value=0.0, step=0.01)
+    v = st.number_input("Volume (L)", min_value=0.0, step=0.01)
+    mr = st.number_input("Berat Molekul (Mr)", min_value=0.0, step=0.1)
+    if st.button("Hitung"):
+        st.success(f"Hasil: {m*v*mr:.4f} gram")
 
-
-# 3. MENU TOOLS
-st.subheader("🛠 Integrated Tools")
-    tab1 = st.tabs(["🧬 Tabel MSDS"])
+elif menu == "🛠 Tools":
+    st.subheader("🛠 Integrated Safety Tools")
+    # Menggabungkan database unsur lokal ke dalam tab menu Tools
+    tab1, tab2 = st.tabs(["🧬 Tabel MSDS 118 Unsur", "🍽️ Food Tools"])
     
     with tab1:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.write("### 🔍 Pencarian Unsur Periodik")
-        # Fungsi dari aplikasi IP 172.20.10.3 disisipkan di sini
-        pilihan = st.selectbox("Pilih Unsur:", list(ELEMENT_DATABASE.keys()))
+        st.markdown("### 🛡️ Database Keselamatan Elemen")
+        st.write("Cari informasi keselamatan resmi dari PubChem.")
+        
+        # Pilihan unsur untuk menampilkan info kimia dan link MSDS
+        pilihan = st.selectbox("Cari Unsur (Bahasa Inggris):", list(ELEMENTS.keys()))
         
         if pilihan:
-            data = ELEMENT_DATABASE[pilihan]
-            # Menampilkan hasil gabungan dalam tabel
-            res_df = pd.DataFrame({
-                "Parameter": ["Simbol", "Nomor Atom", "Kategori", "Potensi Bahaya", "Pertolongan Pertama"],
-                "Detail": [data.get("Symbol") or data.get("Sym"), data.get("Number"), data.get("Category"), data.get("Hazard"), data.get("FirstAid")]
+            data = ELEMENTS[pilihan]
+            msds_url = f"https://pubchem.ncbi.nlm.nih.gov/compound/{data['CID']}#section=Safety-and-Hazards"
+            
+            st.markdown(f"#### 📊 Identitas Kimia: {pilihan}")
+            
+            df_info = pd.DataFrame({
+                "Parameter": ["Simbol", "Nomor Atom", "PubChem CID"],
+                "Detail": [data["Sym"], data["No"], data["CID"]]
             })
-            st.table(res_df)
+            st.table(df_info)
+            
+            st.warning(f"⚠️ Periksa Bahaya GHS untuk {pilihan}")
+            st.markdown(f'''<a href="{msds_url}" target="_blank">
+                <button style="width:100%; border-radius:10px; padding:10px; background-color:#DE1A58; color:white; border:none; cursor:pointer; font-weight:bold;">
+                KLIK UNTUK MSDS LENGKAP {pilihan.upper()}
+                </button></a>''', unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
+    with tab2:
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.markdown("### 🍏 Food Nano-Converter")
+        st.write("Ubah ukuran material pangan ke skala nanometer untuk melihat perubahan sifatnya.")
 
-# =========================================================
-# HALAMAN 4: ABOUT (TIM PENULIS - 4 KOLOM DALAM 1 BARIS) 
-# =========================================================
-elif menu == "👥 About (Tim Penulis)":
-    st.markdown("## 👥 Tim Pengembang NanoTools")
+        # 1. Pilihan Material Pangan
+        material = st.selectbox("Pilih Material Nano Pangan:", 
+                                ["Silver (Antimikroba)", "Gold (Biosensor)", "Silika (Anti-kempal)", "Zat Besi (Fortifikasi)"])
+
+        # 2. Slider Ukuran (dari 1000nm ke 1nm)
+        st.write("---")
+        st.write("#### 📏 Geser untuk Mengecilkan Ukuran:")
+        size = st.slider("Ukuran Partikel (Nanometer)", min_value=1, max_value=1000, value=1000)
+
+        # 3. Logika Perubahan Sifat
+        st.write(f"### Status Material pada {size} nm:")
+        
+        if size > 500:
+            st.info("📦 **Sifat Makro:** Material stabil, warna standar, reaktivitas rendah. Digunakan dalam bentuk curah.")
+        elif 100 < size <= 500:
+            st.warning("🔍 **Sifat Transisi:** Luas permukaan mulai meningkat. Kelarutan dalam air mulai membaik.")
+        else:
+            st.error("✨ **SIFAT NANO AKTIF:**")
+            
+            # Detail Sifat Nano Spesifik
+            if material == "Silver (Antimikroba)":
+                st.write("* **Sifat:** Menjadi agen antibakteri yang sangat kuat untuk kemasan pangan.")
+                st.write("* **Warna:** Berubah menjadi kuning tua/coklat karena efek *Surface Plasmon Resonance*.")
+            elif material == "Gold (Biosensor)":
+                st.write("* **Sifat:** Sangat reaktif secara katalitik. Digunakan untuk mendeteksi bakteri pada makanan.")
+                st.write("* **Warna:** Berubah dari kuning emas menjadi merah anggur.")
+            elif material == "Silika (Anti-kempal)":
+                st.write("* **Sifat:** Memiliki daya serap air yang sangat tinggi (hidrofobik/hidrofilik ekstrem).")
+            elif material == "Zat Besi (Fortifikasi)":
+                st.write("* **Sifat:** Bioavailabilitas meningkat drastis (lebih mudah diserap tubuh manusia).")
+
+            # Kalkulasi Ilmiah Sederhana (Surface-to-Volume Ratio)
+            # Rumus: 3 / radius
+            ratio = 3 / (size / 2)
+            st.metric(label="Rasio Luas Permukaan : Volume", value=f"{ratio:.4f}")
+            st.caption("Semakin tinggi rasio ini, semakin reaktif material tersebut.")
+        
+        st.markdown("</div>", unsafe_allow_html=True)
+
+elif menu == "👥 About":
+    # Bagian About untuk informasi penulis dan institusi
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("👥 Tentang Aplikasi")
+    st.write("**NanoTools Pro** adalah aplikasi asisten laboratorium digital yang dirancang untuk memudahkan peneliti dan mahasiswa dalam kalkulasi kimia serta akses cepat terhadap keamanan bahan kimia (MSDS).")
     
-    # --- Penjelasan Singkat ---
-    make_card_start()
-    st.markdown("<div class='card-header'>Visi Kami</div>", unsafe_allow_html=True)
-    st.write("""
-    Website ini dikembangkan oleh mahasiswa prodi Nanoteknologi Pangan untuk mendigitalisasi 
-    perhitungan laboratorium dan mempermudah akses literatur nanoteknologi.
-    """)
-    make_card_end()
-
-    st.markdown("### Anggota Tim")
-    st.write("") # Spacer
-
-    # Membuat 4 kolom dalam 1 baris
-    col1, col2, col3, col4 = st.columns(4)
-
-    # PENULIS 1
-    with col1:
-        make_card_start()
-        st.image("https://cdn-icons-png.flaticon.com/512/4140/4140048.png", use_container_width=True)
-        st.markdown("<p style='text-align: center; font-weight: bold; margin-bottom: 0;'>Fairuz Zuhria Chayara Alima</p>", unsafe_allow_html=True)
-        st.markdown("<center><span class='role-badge' style='font-size: 0.6rem;'>Penulis</span></center>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; font-size: 0.7rem; color: #666;'>NIM: 2450156</p>", unsafe_allow_html=True)
-        make_card_end()
-
-    # PENULIS 2
-    with col2:
-        make_card_start()
-        st.image("https://cdn-icons-png.flaticon.com/512/4140/4140047.png", use_container_width=True)
-        st.markdown("<p style='text-align: center; font-weight: bold; margin-bottom: 0;'>Intan Nurul Hasanah</p>", unsafe_allow_html=True)
-        st.markdown("<center><span class='role-badge' style='font-size: 0.6rem;'>Penulis</span></center>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; font-size: 0.7rem; color: #666;'>NIM: 2450167</p>", unsafe_allow_html=True)
-        make_card_end()
-
-    # PENULIS 3
-    with col3:
-        make_card_start()
-        st.image("https://cdn-icons-png.flaticon.com/512/4140/4140037.png", use_container_width=True)
-        st.markdown("<p style='text-align: center; font-weight: bold; margin-bottom: 0;'>Meuthia Zulashfi Rhohyan Syafrudin</p>", unsafe_allow_html=True)
-        st.markdown("<center><span class='role-badge' style='font-size: 0.6rem;'>Penulis</span></center>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; font-size: 0.7rem; color: #666;'>NIM: 2450180</p>", unsafe_allow_html=True)
-        make_card_end()
-
-    # PENULIS 4
-    with col4:
-        make_card_start()
-        st.image("https://cdn-icons-png.flaticon.com/512/4140/4140051.png", use_container_width=True)
-        st.markdown("<p style='text-align: center; font-weight: bold; margin-bottom: 0;'>Nicholas Dimas Ananda</p>", unsafe_allow_html=True)
-        st.markdown("<center><span class='role-badge' style='font-size: 0.6rem;'>Penulis</span></center>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; font-size: 0.7rem; color: #666;'>NIM: 2450197</p>", unsafe_allow_html=True)
-        make_card_end()
-
-    # --- Info Instansi ---
     st.markdown("---")
-    st.markdown("<h4 style='text-align: center; color: white;'>Politeknik AKA Bogor</h4>", unsafe_allow_html=True)
+    st.write("**Penulis:**")
+    st.write("👤 **Meutia Zulasfi**")
+    st.write("🆔 **NIM: 2420448**")
+    
+    st.markdown("---")
+    st.write("**Institusi:**")
+    st.info("Politeknik AKA Bogor - Program Studi Nanoteknologi Pangan")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-
-# =============================
-# FOOTER
-# =============================
-st.markdown("<br><br>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: white; font-size: 0.8rem;'>All reserved © 2025 NanoTools. All Rights Reserved.</p>", unsafe_allow_html=True)
+# Footer aplikasi
+st.markdown("<p style='text-align:center; color:white; font-size:0.8rem; margin-top:50px;'>Hak Cipta © 2026 NanoTools Project | Meutia Zulasfi (2420448)</p>", unsafe_allow_html=True)
