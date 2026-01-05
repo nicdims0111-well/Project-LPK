@@ -182,7 +182,7 @@ elif menu == "🔬 Lab Nanoteknologi":
 elif menu == "🛠 Tools":
     st.subheader("🛠 Integrated Safety Tools")
     # Menggabungkan database unsur lokal ke dalam tab menu Tools
-    tab1, tab2, tab3 = st.tabs(["Tabel MSDS 118 Unsur", "Sifat Nanomaterial","Karakterisasi"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Tabel MSDS 118 Unsur", "Sifat Nanomaterial","Karakterisasi","Model"])
     
     with tab1:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
@@ -329,7 +329,6 @@ elif menu == "🛠 Tools":
             st.line_chart(chart_data)
 
         st.markdown("</div>", unsafe_allow_html=True)
-        # 5. Tambahan
         
     with tab4:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
