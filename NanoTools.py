@@ -329,6 +329,71 @@ elif menu == "🛠 Tools":
             st.line_chart(chart_data)
 
         st.markdown("</div>", unsafe_allow_html=True)
+        # 5. Tambahan
+        
+    with tab4:
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.markdown("### 🧊 3D Interaktif Nanopartikel")
+        st.write("Visualisasi model atom nanomaterial dengan kontrol rotasi 360 derajat.")
+        
+        # 1. Pilihan Unsur untuk Model 3D
+        unsur_3d = st.selectbox("Pilih Unsur Nanopartikel:", list(ELEMENTS.keys()), key="u_3d")
+    
+        # 2. Pengaturan Parameter Model
+        col_v1, col_v2 = st.columns(2)
+        with col_v1:
+            n_atoms = st.slider("Jumlah Atom dalam Cluster:", 10, 100, 50)
+        with col_v2:
+            cluster_type = st.radio("Bentuk Cluster:", ["Spherical (Bola)", "Cubic (Kubus)"])
+            
+        # 3. Logika Pembuatan Koordinat Atom
+        def generate_cluster(n, c_type):
+            if c_type == "Spherical (Bola)":
+                phi = np.random.uniform(0, 2*np.pi, n)
+                costheta = np.random.uniform(-1, 1, n)
+                u = np.random.uniform(0, 1, n)
+                theta = np.arccos(costheta)
+                r = 1.0 * np.power(u, 1/3)
+                x = r * np.sin(theta) * np.cos(phi)
+                y = r * np.sin(theta) * np.sin(phi)
+                z = r * np.cos(theta)
+            else: # Cubic
+                x = np.random.uniform(-0.7, 0.7, n)
+                y = np.random.uniform(-0.7, 0.7, n)
+                z = np.random.uniform(-0.7, 0.7, n)
+            return x, y, z
+        
+        x, y, z = generate_cluster(n_atoms, cluster_type)
+        
+        # 4. Rendering 3D menggunakan Plotly
+        fig = go.Figure(data=[go.Scatter3d(
+            x=x, y=y, z=z,
+            mode='markers',
+            marker=dict(
+                size=10,
+                color=x**2 + y**2 + z**2, # Warna gradien berdasarkan jarak dari pusat
+                colorscale='Viridis',
+                opacity=0.8,
+                line=dict(width=1, color='white')
+            )
+        )])
+
+        fig.update_layout(
+            scene=dict(
+                xaxis_title='X (nm)',
+                yaxis_title='Y (nm)',
+                zaxis_title='Z (nm)',
+                bgcolor="rgba(0,0,0,0)"
+            ),
+            margin=dict(l=0, r=0, b=0, t=0),
+            paper_bgcolor="rgba(0,0,0,0)"
+        )
+
+        # Menampilkan Plot Interaktif
+        st.plotly_chart(fig, use_container_width=True)
+    
+        st.info(f"💡 **Info Model:** Menampilkan struktur atom nano-cluster {unsur_3d}. Gunakan mouse/kursor untuk memutar gambar 360 derajat.")
+        st.markdown("</div>", unsafe_allow_html=True)
 
     
 
