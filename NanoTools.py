@@ -182,7 +182,7 @@ elif menu == "🔬 Lab Nanoteknologi":
 elif menu == "🛠 Tools":
     st.subheader("🛠 Integrated Safety Tools")
     # Menggabungkan database unsur lokal ke dalam tab menu Tools
-    tab1, tab2 = st.tabs(["🧬 Tabel MSDS 118 Unsur", "🍽️ Food Tools"])
+    tab1, tab2, tab3 = st.tabs(["Tabel MSDS 118 Unsur", "Sifat Nanomaterial","Karakterisasi"])
     
     with tab1:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
@@ -214,37 +214,123 @@ elif menu == "🛠 Tools":
     with tab2:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.markdown("### Nano-Converter")
-        st.write("Simulasi perubahan sifat atom saat dikonversi ke skala nanometer.")
+        st.write("Analisis perubahan sifat fisik dan kimia atom pada skala nanometer.")
+    
+    # 1. Pilih Unsur dari Database 118 Unsur
+    pilihan_nano = st.selectbox("Pilih Unsur untuk Konversi Nano:", list(ELEMENTS.keys()))
+    
+    # 2. Slider Ukuran
+    size_nano = st.slider("Atur Ukuran Partikel (nm):", 1, 1000, 1000, key="slider_nano")
 
-        # Pilihan Material Berbasis Pangan
-        material = st.selectbox("Pilih Material:", ["Silver (Ag)", "Gold (Au)", "Iron (Fe)", "Silika (SiO2)"])
-
-        # Slider Skala Nanometer
-        st.write("---")
-        size = st.slider("Ukuran Partikel (nm):", min_value=1, max_value=1000, value=1000)
-
-        # Logika Perubahan Sifat Atom
-        st.write(f"#### Hasil Analisis pada {size} nm:")
+    if size_nano <= 100:
+        st.error(f"✨ **MODE NANO AKTIF: {pilihan_nano}**")
         
-        if size > 100:
-            st.info("📦 **Sifat Makro:** Material bertindak sebagai material curah (bulk). Reaktivitas rendah.")
-        else:
-            st.error("✨ **Sifat Nano Aktif:**")
-            # Rasio luas permukaan (Surface-to-Volume Ratio) meningkat drastis
-            # Rumus sederhana: $6/D$ (untuk bola)
-            ratio = 6 / size 
-            st.metric(label="Rasio Luas Permukaan : Volume", value=f"{ratio:.2f}")
+        # Kalkulasi Rasio Luas Permukaan (Kunci sifat nanomaterial)
+        # Rumus: 6 / Diameter
+        ratio_nano = 6 / size_nano 
+        st.metric(label="Rasio Luas Permukaan : Volume", value=f"{ratio_nano:.2f}")
+
+        # 3. Logika Sifat Otomatis untuk 118 Unsur
+        # Menentukan kategori berdasarkan jenis unsur (Logam, Non-Logam, dll)
+        
+        def get_nano_properties(element):
+            # Kategori Logam Mulia (Ag, Au, Pt)
+            if element in ["Silver", "Gold", "Platinum"]:
+                return {
+                    "Hambat": "Sangat Tinggi (Interaksi ion permukaan dengan membran sel).",
+                    "Warna": "Berubah drastis (Efek LSPR - Surface Plasmon Resonance).",
+                    "Larut": "Dispersi koloid stabil, meningkatkan efektivitas dalam cairan."
+                }
+            # Kategori Logam Transisi / Nutrisi (Fe, Zn, Cu, Mg)
+            elif element in ["Iron", "Zinc", "Copper", "Magnesium", "Calcium"]:
+                return {
+                    "Hambat": "Moderat (Memicu ROS/Stres Oksidatif pada bakteri).",
+                    "Warna": "Lebih gelap/intens karena luas permukaan yang besar.",
+                    "Larut": "Bioavailabilitas meningkat drastis (Sangat mudah diserap tubuh)."
+                }
+            # Kategori Metaloid/Non-Logam (Si, C, Se)
+            elif element in ["Silicon", "Carbon", "Selenium"]:
+                return {
+                    "Hambat": "Spesifik (Bergantung pada modifikasi permukaan/fungsionalisasi).",
+                    "Warna": "Cenderung transparan atau hitam (bergantung pada struktur nano).",
+                    "Larut": "Daya ikat (adsorpsi) meningkat drastis."
+                }
+            # Default untuk unsur lainnya
+            else:
+                return {
+                    "Hambat": "Bergantung pada reaktivitas atom di permukaan.",
+                    "Warna": "Pergeseran spektrum cahaya akibat ukuran partikel.",
+                    "Larut": "Peningkatan kinetika pelarutan karena rasio luas permukaan."
+                }
+
+        sifat = get_nano_properties(pilihan_nano)
+        
+        # 4. Tampilan Kolom Sifat
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.info(f" **Daya Hambat**\n\n{sifat['Hambat']}")
+        with col2:
+            st.warning(f" **Warna**\n\n{sifat['Warna']}")
+        with col3:
+            st.success(f" **Kelarutan**\n\n{sifat['Larut']}")
             
-            if material == "Silver (Ag)":
-                st.write("**Efek:** Daya hambat bakteri (antibakteri) meningkat drastis karena luas permukaan kontak dengan dinding sel mikroba lebih besar.")
-            elif material == "Gold (Au)":
-                st.write("**Efek:** Warna berubah dari keemasan menjadi merah/ungu karena efek *Localized Surface Plasmon Resonance* (LSPR).")
-            elif material == "Iron (Fe)":
-                st.write("**Efek:** Kelarutan dan bioavailabilitas dalam tubuh meningkat, sangat efektif untuk fortifikasi pangan.")
-            elif material == "Silika (SiO2)":
-                st.write("**Efek:** Luas permukaan yang besar membuatnya sangat efektif sebagai zat anti-kempal (anti-caking agent).")
+    else:
+        st.info("📦 **Sifat Makro (Bulk):** Material masih berukuran besar. Geser slider di bawah 100 nm untuk melihat sifat spesifik nanometer.")
+    
+    st.markdown("</div>", unsafe_allow_html=True)
+    
+    with tab3:
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.markdown("### 🔬 Karakterisasi Nanomaterial")
+        st.write("Prediksi hasil analisis instrumen untuk 118 unsur dalam skala nano.")
+
+        # 1. Pilih Unsur & Metode Analisis
+        col_a, col_b = st.columns(2)
+        with col_a:
+            unsur_karak = st.selectbox("Pilih Unsur:", list(ELEMENTS.keys()), key="unsur_karak")
+        with col_b:
+            metode = st.selectbox("Pilih Instrumen:", ["SEM", "TEM", "AFM", "XRD", "FTIR", "UV-Vis"])
+
+        # 2. Logika Karakterisasi Otomatis (Berlaku untuk semua 118 unsur)
+        def dapatkan_hasil_karakterisasi(unsur, instrumen):
+            # Pengelompokan tipe unsur untuk akurasi data
+            logam = ["Gold", "Silver", "Copper", "Iron", "Zinc", "Nickel", "Platinum", "Aluminum"]
+            non_logam = ["Carbon", "Silicon", "Sulfur", "Phosphorus", "Selenium"]
+            
+            # Logika berdasarkan Instrumen
+            if instrumen == "SEM":
+                return "Morfologi permukaan terdeteksi. Terlihat agregasi partikel dan distribusi ukuran pada skala mikrometer hingga nanometer tinggi."
+            elif instrumen == "TEM":
+                return "Struktur internal dan kristalinitas terlihat jelas. Resolusi tinggi memungkinkan pengamatan bentuk partikel (spherical/rod) secara presisi."
+            elif instrumen == "AFM":
+                return "Topografi permukaan 3D dan kekasaran permukaan ($Roughness$) terukur dalam skala atomik."
+            elif instrumen == "XRD":
+                if unsur in logam:
+                    return "Puncak difraksi tajam (Bragg peaks) menunjukkan struktur kristal (FCC/BCC) yang sangat teratur."
+                else:
+                    return "Pola difraksi menunjukkan fasa amorf atau semi-kristalin bergantung pada metode sintesis."
+            elif instrumen == "FTIR":
+                return "Gugus fungsi pada permukaan terdeteksi. Menunjukkan interaksi antara partikel dengan agen penudung (*capping agent*)."
+            elif instrumen == "UV-Vis":
+                if unsur in ["Gold", "Silver"]:
+                    return "Terdeteksi puncak absorbansi spesifik akibat fenomena *Surface Plasmon Resonance* (SPR)."
+                else:
+                    return "Spektrum absorbansi menunjukkan nilai *Band Gap* energi yang bergeser ke arah biru (*blue shift*)."
+
+        # 3. Output Analisis
+        st.markdown("---")
+        st.success(f"**Hasil Analisis {metode} untuk Nano-{unsur_karak}:**")
+        st.write(dapatkan_hasil_karakterisasi(unsur_karak, metode))
+        
+        # 4. Tambahan Visual Representasi (Simulasi Grafik)
+        if metode in ["XRD", "UV-Vis"]:
+            st.write("💡 *Simulasi Tren Grafik:*")
+            chart_data = pd.DataFrame(np.random.rand(10, 1), columns=['Intensity'])
+            st.line_chart(chart_data)
 
         st.markdown("</div>", unsafe_allow_html=True)
+
+    
 
 elif menu == "👥 About":
     # Bagian About untuk informasi penulis dan institusi
@@ -263,4 +349,4 @@ elif menu == "👥 About":
     st.markdown("</div>", unsafe_allow_html=True)
 
 # Footer aplikasi
-st.markdown("<p style='text-align:center; color:white; font-size:0.8rem; margin-top:50px;'>Hak Cipta © 2026 NanoTools Project | Meutia Zulasfi (2420448)</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align:center; color:white; font-size:0.8rem; margin-top:50px;'>All Rights Reserved © 2026 NanoTools Project</p>", unsafe_allow_html=True)
