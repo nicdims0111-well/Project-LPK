@@ -213,7 +213,7 @@ elif menu == "🛠 Tools":
 
     with tab2:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("### 🍏 Food Nano-Converter")
+        st.markdown("### Nano-Converter")
         st.write("Simulasi perubahan sifat atom saat dikonversi ke skala nanometer.")
 
         # Pilihan Material Berbasis Pangan
