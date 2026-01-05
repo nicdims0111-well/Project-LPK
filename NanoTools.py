@@ -213,5 +213,4 @@ elif menu == "👥 About (Tim Penulis)":
 # FOOTER
 # =============================
 st.markdown("<br><br>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: white; font-size: 0.8rem;'>Hak Cipta © 2025 NanoTools. All Rights Reserved.</p>", unsafe_allow_html=True)
-
+st.markdown("<p style='text-align: center; color: white; font-size: 0.8rem;'>Hak Cipta nano © 2025 NanoTools. All Rights Reserved.</p>", unsafe_allow_html=True)
