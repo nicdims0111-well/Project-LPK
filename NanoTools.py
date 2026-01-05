@@ -135,17 +135,25 @@ elif menu == "🔬 Lab Nanoteknologi":
 
 
 # 3. MENU TOOLS
-elif menu == "🛠 Tools":
-    st.title("🛠 Extra Tools")
-    tab1, tab2 = st.tabs(["🧬 Nano Tools", "🍽️ Food Tools"])
+st.subheader("🛠 Integrated Tools")
+    tab1 = st.tabs(["🧬 Tabel MSDS"])
+    
     with tab1:
-        make_card_start()
-        st.write("Kalkulator tambahan Nanoteknologi akan muncul di sini.")
-        make_card_end()
-    with tab2:
-        make_card_start()
-        st.write("Konverter unit pangan akan muncul di sini.")
-        make_card_end()
+        st.markdown("<div class='card'>", unsafe_allow_html=True)
+        st.write("### 🔍 Pencarian Unsur Periodik")
+        # Fungsi dari aplikasi IP 172.20.10.3 disisipkan di sini
+        pilihan = st.selectbox("Pilih Unsur:", list(ELEMENT_DATABASE.keys()))
+        
+        if pilihan:
+            data = ELEMENT_DATABASE[pilihan]
+            # Menampilkan hasil gabungan dalam tabel
+            res_df = pd.DataFrame({
+                "Parameter": ["Simbol", "Nomor Atom", "Kategori", "Potensi Bahaya", "Pertolongan Pertama"],
+                "Detail": [data.get("Symbol") or data.get("Sym"), data.get("Number"), data.get("Category"), data.get("Hazard"), data.get("FirstAid")]
+            })
+            st.table(res_df)
+        st.markdown("</div>", unsafe_allow_html=True)
+
 
 # =========================================================
 # HALAMAN 4: ABOUT (TIM PENULIS - 4 KOLOM DALAM 1 BARIS) 
@@ -213,4 +221,4 @@ elif menu == "👥 About (Tim Penulis)":
 # FOOTER
 # =============================
 st.markdown("<br><br>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; color: white; font-size: 0.8rem;'>Hak Cipta nano © 2025 NanoTools. All Rights Reserved.</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: white; font-size: 0.8rem;'>All reserved © 2025 NanoTools. All Rights Reserved.</p>", unsafe_allow_html=True)
