@@ -47,7 +47,7 @@ ELEMENTS = {
     "Rubidium": {"Sym": "Rb", "No": 37, "CID": "5462223"},
     "Strontium": {"Sym": "Sr", "No": 38, "CID": "5460339"},
     "Yttrium": {"Sym": "Y", "No": 39, "CID": "5460338"},
-    "Zirconium": {"Sym": "Zr", "No": 40, "CID": "23995"},
+    "Zirconium": {"Sym": "Zr", "No": 40, "CID": "23995"}, 
     "Niobium": {"Sym": "Nb", "No": 41, "CID": "23934"},
     "Molybdenum": {"Sym": "Mo", "No": 42, "CID": "23932"},
     "Technetium": {"Sym": "Tc", "No": 43, "CID": "23959"},
@@ -183,7 +183,7 @@ st.markdown(f"""
     
     /* Warna Tab */
     .stTabs [data-baseweb="tab"] {{
-        color: white;
+        color: white; 
     }}
 </style>
 """, unsafe_allow_html=True)
