@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import plotly.graph_objects as go 
 
 # ==========================================
 # 1. DATABASE 118 UNSUR & LINK MSDS PUBCHEM
@@ -127,30 +128,63 @@ ELEMENTS = {
     "Oganesson": {"Sym": "Og", "No": 118, "CID": "135246760"},
 }
 
-# =============================
-# 2. KONFIGURASI HALAMAN & CSS
-# =============================
-st.set_page_config(page_title="NanoTools Pro", page_icon="🧬", layout="centered")
+# ==========================================
+# 1. KONFIGURASI HALAMAN
+# ==========================================
+st.set_page_config(page_title="NanoTools", page_icon="🌀", layout="centered")
 
-st.markdown("""
+# =============================
+# 2. CUSTOM CSS (TEMA BIRU)
+# =============================
+st.markdown(f"""
 <style>
-.stApp {
-    background: linear-gradient(-45deg, #360185, #8F0177, #DE1A58, #F4B342);
-    background-size: 400% 400%;
-    animation: gradient 15s ease infinite;
-}
-@keyframes gradient {
-    0% {background-position: 0% 50%;}
-    50% {background-position: 100% 50%;}
-    100% {background-position: 0% 50%;}
-}
-.card {
-    background: rgba(255, 255, 255, 0.9);
-    padding: 20px;
-    border-radius: 15px;
-    color: #333;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-}
+    /* Latar Belakang Utama Biru #547792 */
+    .stApp {{
+        background-color: #547792;
+    }}
+    
+    /* Header Utama Biru Gelap #213448 */
+    .main-header {{
+        background-color: #213448;
+        padding: 20px;
+        border-radius: 10px;
+        color: white;
+        text-align: center;
+        margin-bottom: 25px;
+        border-bottom: 4px solid #94B4C1;
+    }}
+
+    /* Sidebar Styling */
+    [data-testid="stSidebar"] {{
+        background-color: #213448;
+    }}
+    [data-testid="stSidebar"] * {{
+        color: white !important;
+    }}
+
+    /* Kartu Konten Putih agar Teks Terbaca */
+    .card {{
+        background-color: rgba(255, 255, 255, 0.95);
+        padding: 20px;
+        border-radius: 15px;
+        color: #213448;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        margin-bottom: 20px;
+    }}
+
+    /* Tombol */
+    .stButton>button {{
+        background-color: #213448;
+        color: white;
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid #94B4C1;
+    }}
+    
+    /* Warna Tab */
+    .stTabs [data-baseweb="tab"] {{
+        color: white;
+    }}
 </style>
 """, unsafe_allow_html=True)
 
@@ -164,46 +198,269 @@ with st.sidebar:
 # =============================
 # 4. LOGIKA HALAMAN UTAMA
 # =============================
-st.markdown("<h1 style='text-align:center; color:white;'>🧬 NanoTools Pro</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align:center; color:white;'>🧬 NanoTools</h1>", unsafe_allow_html=True)
 
 if menu == "📈 Insight":
-    st.subheader("📊 Research Insight")
-    st.line_chart(pd.DataFrame(np.random.randn(20, 2), columns=['Nano-A', 'Nano-B']))
+    st.markdown("<div class='main-header'><h2>📈 Nanotechnology Insights</h2></div>", unsafe_allow_html=True)
+
+    # --- BAGIAN 1: DEFINISI & SKALA ---
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("APA ITU NANOMATERIAL?")
+    url = "gifnanomaterial.gif"
+    st.image(url, caption="Skema Nanomaterial", use_container_width=True)
+    st.write("""
+    **Nanomaterial** adalah material yang memiliki ukuran sangat kecil, yaitu pada skala nanometer (sekitar 1–100 nm), sehingga menunjukkan sifat fisik, kimia, dan biologis yang berbeda dibandingkan material berukuran biasa. Karena ukurannya yang sangat kecil, nanomaterial sering memiliki reaktivitas tinggi, luas permukaan besar, dan kinerja yang lebih baik, sehingga banyak dimanfaatkan dalam bidang kesehatan, pangan, energi, dan teknologi.
+
+    """)
+
+    # Membuat 4 kolom dalam 1 baris
+    col1, col2, col3, col4 = st.columns(4)
+
+    # NANOMATERIAL 0D
+    with col1:
+        st.image("1d.jpeg", use_container_width=True)
+        st.markdown("<p style='text-align: center; font-weight: bold; margin-bottom: 0;'>Nanopartikel 0D</p>", unsafe_allow_html=True)
+        st.markdown("<center><span class='role-badge' style='font-size: 0.6rem;'>0D (Nol Dimensi): Nanopartikel Seluruh dimensinya (panjang, lebar, dan tinggi) berada dalam skala nano (1–100 nm). Material ini berbentuk seperti titik atau bola-bola sangat kecil. Contoh: Quantum dots, nanopartikel emas (AuNP).</span></center>", unsafe_allow_html=True)
+
+    # NANOMATERIAL 1D
+    with col2:
+        st.image("2d.jpeg", use_container_width=True)
+        st.markdown("<p style='text-align: center; font-weight: bold; margin-bottom: 0;'>Nanopartikel 1D</p>", unsafe_allow_html=True)
+        st.markdown("<center><span class='role-badge' style='font-size: 0.6rem;'>1D (Satu Dimensi): Nanowires / Nanotubes Dua dimensi berada dalam skala nano, sedangkan satu dimensi lainnya memanjang (makroskopis). Bentuknya menyerupai jarum, kabel, atau tabung panjang. Contoh: Carbon Nanotubes (CNT), nanowires logam.</span></center>", unsafe_allow_html=True)
+
+    # NANOMATERIAL 2D
+    with col3:
+        st.image("3d.jpeg", use_container_width=True)
+        st.markdown("<p style='text-align: center; font-weight: bold; margin-bottom: 0;'>Nanopartikel 2D</p>", unsafe_allow_html=True)
+        st.markdown("<center><span class='role-badge' style='font-size: 0.6rem;'>2D (Dua Dimensi): Nanosheets Hanya satu dimensi (ketebalan) yang berada dalam skala nano, sementara dua dimensi lainnya (luas) berukuran besar. Berbentuk seperti lembaran atau lapisan yang sangat tipis. Contoh: Graphene, nanoclays.</span></center>", unsafe_allow_html=True)
+
+    # NANOMATERIAL 3D
+    with col4:
+        st.image("4d.jpeg", use_container_width=True)
+        st.markdown("<p style='text-align: center; font-weight: bold; margin-bottom: 0;'>Nanopartikel 3D</p>", unsafe_allow_html=True)
+        st.markdown("<center><span class='role-badge' style='font-size: 0.6rem;'>3D (Tiga Dimensi): Nanokomposit Secara fisik ukurannya besar (di luar skala nano), namun struktur internalnya tersusun dari material skala nano atau merupakan gabungan dari unit-unit nano yang terdispersi dalam suatu matriks. Contoh: Serat karbon, material polimer yang diperkuat nanopartikel.</span></center>", unsafe_allow_html=True)
+
+    # --- BAGIAN 3: SIFAT UNIK (EFEK UKURAN) ---
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("✨ Mengapa Material Nano Berbeda?")
+    
+    tab_a, tab_b = st.tabs(["Rasio Permukaan", "Efek Kuantum"])
+    
+    with tab_a:
+        st.write("**Efek Luas Permukaan:** Semakin kecil partikel, semakin banyak atom yang berada di permukaan, membuatnya sangat reaktif.")
+        # Grafik simulasi rasio permukaan vs ukuran
+        x_size = np.linspace(10, 500, 50)
+        y_surface = 6 / x_size # Rumus sederhana rasio S/V kubus
+        
+        fig_surf = go.Figure()
+        fig_surf.add_trace(go.Scatter(x=x_size, y=y_surface, mode='lines', line=dict(color='#213448', width=3)))
+        fig_surf.update_layout(title="Rasio Permukaan vs Ukuran Partikel", xaxis_title="Ukuran (nm)", yaxis_title="Rasio S/V")
+        st.plotly_chart(fig_surf, use_container_width=True)
+
+    with tab_b:
+        st.write("**Efek Kuantum:** Pada skala nano, sifat optik dan elektronik berubah. Contoh: Emas nano bisa berwarna merah atau ungu, bukan kuning.")
+        st.info("💡 Ini terjadi karena pembatasan gerak elektron (Quantum Confinement).")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # --- BAGIAN 4: PERBANDINGAN BULK VS NANO ---
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.subheader("⚖️ Perbandingan: Bulk vs Nano")
+    comparison = {
+        "Properti": ["Warna", "Kereaktifan", "Kekuatan", "Titik Lebur"],
+        "Material Bulk": ["Tetap/Konstan", "Rendah", "Standar", "Tinggi"],
+        "Material Nano": ["Bergantung Ukuran", "Sangat Tinggi", "Sangat Kuat", "Lebih Rendah"]
+    }
+    st.table(pd.DataFrame(comparison))
+    st.markdown("</div>", unsafe_allow_html=True)
 
 elif menu == "🔬 Lab Nanoteknologi":
-    st.subheader("🧪 Kalkulator Molaritas")
-    # Logika untuk menghitung massa (gram) berdasarkan input pengguna
-    m = st.number_input("Molaritas (M)", min_value=0.0, step=0.01)
-    v = st.number_input("Volume (L)", min_value=0.0, step=0.01)
-    mr = st.number_input("Berat Molekul (Mr)", min_value=0.0, step=0.1)
-    if st.button("Hitung"):
-        st.success(f"Hasil: {m*v*mr:.4f} gram")
+    st.subheader("🧪 Kalkulator Lab — Konversi & Persiapan Larutan")
+    st.markdown("<div class='card'>", unsafe_allow_html=True)
+    st.write("Modul ini berisi: konversi satuan (M, mM, µM, N, ppm, ppb), kalkulator pengenceran (C1V1=C2V2), dan kalkulator pembuatan larutan (dari Mr).")
+
+    # ------------------
+    # 1) KONVERSI SATUAN
+    # ------------------
+    st.markdown("### 🔁 Konversi Satuan")
+    with st.expander("Buka Konversi Satuan"):
+        conv_col1, conv_col2 = st.columns(2)
+        with conv_col1:
+            conv_from = st.selectbox("Dari:", ["M (mol/L)", "mM (mmol/L)", "µM (µmol/L)", "N (normal)", "ppm (mg/L)", "ppb (µg/L)"])
+            val_from = st.number_input("Nilai", value=1.0, format="%.6f")
+            mr_conv = st.number_input("Mr (g/mol) — diperlukan kalau konversi melibatkan massa/ppm", min_value=0.0, value=18.015, step=0.1)
+        with conv_col2:
+            conv_to = st.selectbox("Ke:", ["M (mol/L)", "mM (mmol/L)", "µM (µmol/L)", "N (normal)", "ppm (mg/L)", "ppb (µg/L)"])
+            eq_per_mol = st.number_input("Bilangan ekuivalen per mol (untuk Normalitas) — gunakan 1 jika tidak tahu", min_value=0.0, value=1.0, step=1.0)
+
+        def convert_units(value, frm, to, mr, eq):
+            # Normalisasi semua ke molarity (mol/L) sebagai basis bila memungkinkan
+            # Konversi masuk -> mol/L
+            if frm == "M (mol/L)":
+                mol_L = value
+            elif frm == "mM (mmol/L)":
+                mol_L = value / 1000.0
+            elif frm == "µM (µmol/L)":
+                mol_L = value / 1e6
+            elif frm == "N (normal)":
+                # N = equiv/L ; mol/L = N / eq_per_mol
+                if eq == 0:
+                    mol_L = 0
+                else:
+                    mol_L = value / eq
+            elif frm == "ppm (mg/L)":
+                # asumsi: larutan berair, 1 ppm = 1 mg/L; mg/L -> g/L -> mol/L
+                mol_L = (value / 1000.0) / mr if mr > 0 else 0
+            elif frm == "ppb (µg/L)":
+                mol_L = (value / 1e6) / mr if mr > 0 else 0
+            else:
+                mol_L = 0
+
+            # Konversi mol/L -> tujuan
+            if to == "M (mol/L)":
+                return mol_L
+            elif to == "mM (mmol/L)":
+                return mol_L * 1000.0
+            elif to == "µM (µmol/L)":
+                return mol_L * 1e6
+            elif to == "N (normal)":
+                return mol_L * eq
+            elif to == "ppm (mg/L)":
+                # mol/L -> g/L -> mg/L
+                return mol_L * mr * 1000.0
+            elif to == "ppb (µg/L)":
+                return mol_L * mr * 1e6
+            else:
+                return None
+
+        if st.button("Konversi", key="konv"):
+            try:
+                result = convert_units(val_from, conv_from, conv_to, mr_conv, eq_per_mol)
+                st.success(f"Hasil: {result:.6g} {conv_to}")
+                # Tampilkan juga penjelasan singkat
+                st.caption("Catatan: untuk konversi ppm/ppb kami mengasumsikan kerapatan larutan = 1 g/mL (air). Normalitas memerlukan bilangan ekuivalen per mol.")
+            except Exception as e:
+                st.error(f"Gagal mengonversi: {e}")
+
+    st.markdown("---")
+
+    # ------------------
+    # 2) KALKULATOR PENGENCERAN (C1V1 = C2V2)
+    # ------------------
+    st.markdown("### 🔬 Kalkulator Pengenceran (C1V1 = C2V2)")
+    with st.expander("Buka Kalkulator Pengenceran"):
+        dc1, dc2 = st.columns(2)
+        with dc1:
+            c1 = st.number_input("C1 (konsentrasi stok)", value=1.0, format="%.6g")
+            u1 = st.selectbox("Unit C1", ["M", "mM", "µM", "% (w/v)", "g/L"], key="u1")
+            v2 = st.number_input("V2 (volume akhir yang diinginkan)", value=100.0, format="%.6g")
+            u_v2 = st.selectbox("Unit Volume V2", ["mL", "L"], index=0, key="uv2")
+        with dc2:
+            c2 = st.number_input("C2 (konsentrasi akhir yang diinginkan)", value=0.1, format="%.6g")
+            u2 = st.selectbox("Unit C2", ["M", "mM", "µM", "% (w/v)", "g/L"], key="u2")
+            v1 = st.number_input("V1 (volume stok yg diperlukan) — kosongkan 0 untuk dihitung", value=0.0, format="%.6g")
+            u_v1 = st.selectbox("Unit Volume V1", ["mL", "L"], index=0, key="uv1")
+
+        # Helper untuk normalisasi konsentrasi ke mol/L bila unit M/mM/µM, atau ke g/L jika % atau g/L
+        def normalize_conc_to_molL(c, unit, mr=0):
+            if unit == "M":
+                return c
+            elif unit == "mM":
+                return c / 1000.0
+            elif unit == "µM":
+                return c / 1e6
+            elif unit == "% (w/v)":
+                # % w/v = g per 100 mL -> g/L = % * 10 ; mol/L = g/L / Mr
+                g_per_L = c * 10.0
+                return (g_per_L / mr) if mr > 0 else None
+            elif unit == "g/L":
+                return (c / mr) if mr > 0 else None
+            else:
+                return None
+
+        if st.button("Hitung V1 (atau C1 jika V1=0)", key="dilute"):
+            try:
+                # convert volumes to L
+                V2_L = v2 / 1000.0 if u_v2 == "mL" else v2
+                # Try compute V1 if C1 known
+                C1_mol = normalize_conc_to_molL(c1, u1, mr_conv)
+                C2_mol = normalize_conc_to_molL(c2, u2, mr_conv)
+                if C1_mol is None or C2_mol is None:
+                    st.error("Tidak bisa menghitung: pastikan Mr diisi jika menggunakan unit % atau g/L.")
+                else:
+                    V1_L = (C2_mol * V2_L) / C1_mol
+                    V1 = V1_L * 1000.0 if u_v1 == "mL" else V1_L
+                    st.success(f"Volume stok yang diperlukan V1 = {V1:.6g} {u_v1}")
+                    st.caption("Rumus yang digunakan: C1*V1 = C2*V2 (unit konsentrasi harus sebanding, maka kami konversi ke mol/L)")
+            except Exception as e:
+                st.error(f"Gagal menghitung pengenceran: {e}")
+
+    st.markdown("---")
+
+    # ------------------
+    # 3) KALKULATOR PEMBUATAN LARUTAN (GRAM YG HARUS DITIMBANG)
+    # ------------------
+    st.markdown("### ⚖️ Kalkulator Pembuatan Larutan (Hitung gram padatan)")
+    with st.expander("Buka Kalkulator Pembuatan Larutan"):
+        colp1, colp2 = st.columns(2)
+        with colp1:
+            mr_input = st.number_input("Mr (g/mol)", min_value=0.0, value=mr_conv, step=0.01)
+            desired_conc = st.number_input("Konsentrasi yang diinginkan (angka saja)", min_value=0.0, value=0.1, step=0.0001, format="%.6g")
+            conc_unit = st.selectbox("Unit konsentrasi:", ["M","mM","µM","g/L","% (w/v)"])
+        with colp2:
+            vol_val = st.number_input("Volume yang ingin dibuat", min_value=0.0, value=100.0, step=0.1)
+            vol_unit = st.selectbox("Unit volume:", ["mL","L"], index=0)
+
+        def grams_needed(mr, conc, conc_unit, vol, vol_unit):
+            # convert volume to L
+            V_L = vol / 1000.0 if vol_unit == "mL" else vol
+            if conc_unit == "M":
+                # gram = M (mol/L) * Mr (g/mol) * V (L)
+                return conc * mr * V_L
+            elif conc_unit == "mM":
+                return (conc / 1000.0) * mr * V_L
+            elif conc_unit == "µM":
+                return (conc / 1e6) * mr * V_L
+            elif conc_unit == "g/L":
+                return conc * V_L
+            elif conc_unit == "% (w/v)":
+                # % w/v = g/100mL; grams = % * (vol_mL / 100)
+                vol_mL = vol if vol_unit == "mL" else vol * 1000.0
+                return conc * (vol_mL / 100.0)
+            else:
+                return None
+
+        if st.button("Hitung Gram yang Harus Ditimbang", key="prep"):
+            try:
+                grams = grams_needed(mr_input, desired_conc, conc_unit, vol_val, vol_unit)
+                if grams is None:
+                    st.error("Unit tidak dikenali")
+                else:
+                    st.success(f"Timbang sebanyak: {grams:.6g} gram")
+                    st.caption("Catatan: cek kemurnian reagen dan sesuaikan massa aktual jika reagen tidak murni.")
+            except Exception as e:
+                st.error(f"Gagal menghitung: {e}")
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 elif menu == "🛠 Tools":
     st.subheader("🛠 Integrated Safety Tools")
-    # Menggabungkan database unsur lokal ke dalam tab menu Tools
-    tab1, tab2, tab3, tab4 = st.tabs(["Tabel MSDS 118 Unsur", "Sifat Nanomaterial","Karakterisasi","Model"])
+    # Existing Tools content (kept as in original file)...
+    tab1, tab2, tab3= st.tabs(["Tabel MSDS 118 Unsur", "Sifat Nanomaterial","Model"])
     
     with tab1:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.markdown("### 🛡️ Database Keselamatan Elemen")
         st.write("Cari informasi keselamatan resmi dari PubChem.")
-        
-        # Pilihan unsur untuk menampilkan info kimia dan link MSDS
         pilihan = st.selectbox("Cari Unsur (Bahasa Inggris):", list(ELEMENTS.keys()))
-        
         if pilihan:
             data = ELEMENTS[pilihan]
             msds_url = f"https://pubchem.ncbi.nlm.nih.gov/compound/{data['CID']}#section=Safety-and-Hazards"
-            
             st.markdown(f"#### 📊 Identitas Kimia: {pilihan}")
-            
             df_info = pd.DataFrame({
                 "Parameter": ["Simbol", "Nomor Atom", "PubChem CID"],
                 "Detail": [data["Sym"], data["No"], data["CID"]]
             })
             st.table(df_info)
-            
             st.warning(f"⚠️ Periksa Bahaya GHS untuk {pilihan}")
             st.markdown(f'''<a href="{msds_url}" target="_blank">
                 <button style="width:100%; border-radius:10px; padding:10px; background-color:#DE1A58; color:white; border:none; cursor:pointer; font-weight:bold;">
@@ -215,202 +472,167 @@ elif menu == "🛠 Tools":
         st.markdown("<div class='card'>", unsafe_allow_html=True)
         st.markdown("### Nano-Converter")
         st.write("Analisis perubahan sifat fisik dan kimia atom pada skala nanometer.")
-    
-    # 1. Pilih Unsur dari Database 118 Unsur
-    pilihan_nano = st.selectbox("Pilih Unsur untuk Konversi Nano:", list(ELEMENTS.keys()))
-    
-    # 2. Slider Ukuran
-    size_nano = st.slider("Atur Ukuran Partikel (nm):", 1, 1000, 1000, key="slider_nano")
-
-    if size_nano <= 100:
-        st.error(f"✨ **MODE NANO AKTIF: {pilihan_nano}**")
+        pilihan_nano = st.selectbox("Pilih Unsur untuk Konversi Nano:", list(ELEMENTS.keys()))
+        size_nano = st.slider("Atur Ukuran Partikel (nm):", 1, 1000, 1000, key="slider_nano")
+        if size_nano <= 100:
+            st.error(f"✨ *MODE NANO AKTIF: {pilihan_nano}*")
+            ratio_nano = 6 / size_nano 
+            st.metric(label="Rasio Luas Permukaan : Volume", value=f"{ratio_nano:.2f}")
+            def get_nano_properties(element):
+                if element in ["Silver", "Gold", "Platinum"]:
+                    return {"Hambat": "Sangat Tinggi (Interaksi ion permukaan dengan membran sel).",
+                            "Warna": "Berubah drastis (Efek LSPR - Surface Plasmon Resonance).",
+                            "Larut": "Dispersi koloid stabil, meningkatkan efektivitas dalam cairan."}
+                elif element in ["Iron", "Zinc", "Copper", "Magnesium", "Calcium"]:
+                    return {"Hambat": "Moderat (Memicu ROS/Stres Oksidatif pada bakteri).",
+                            "Warna": "Lebih gelap/intens karena luas permukaan yang besar.",
+                            "Larut": "Bioavailabilitas meningkat drastis (Sangat mudah diserap tubuh)."}
+                elif element in ["Silicon", "Carbon", "Selenium"]:
+                    return {"Hambat": "Spesifik (Bergantung pada modifikasi permukaan/fungsionalisasi).",
+                            "Warna": "Cenderung transparan atau hitam (bergantung pada struktur nano).",
+                            "Larut": "Daya ikat (adsorpsi) meningkat drastis."}
+                else:
+                    return {"Hambat": "Bergantung pada reaktivitas atom di permukaan.",
+                            "Warna": "Pergeseran spektrum cahaya akibat ukuran partikel.",
+                            "Larut": "Peningkatan kinetika pelarutan karena rasio luas permukaan."}
+            sifat = get_nano_properties(pilihan_nano)
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.info(f" *Daya Hambat*\n\n{sifat['Hambat']}")
+            with col2:
+                st.warning(f" *Warna*\n\n{sifat['Warna']}")
+            with col3:
+                st.success(f" *Kelarutan*\n\n{sifat['Larut']}")
+        else:
+            st.info("📦 *Sifat Makro (Bulk):* Material masih berukuran besar. Geser slider di bawah 100 nm untuk melihat sifat spesifik nanometer.")
+        st.markdown("</div>", unsafe_allow_html=True)
         
-        # Kalkulasi Rasio Luas Permukaan (Kunci sifat nanomaterial)
-        # Rumus: 6 / Diameter
-        ratio_nano = 6 / size_nano 
-        st.metric(label="Rasio Luas Permukaan : Volume", value=f"{ratio_nano:.2f}")
-
-        # 3. Logika Sifat Otomatis untuk 118 Unsur
-        # Menentukan kategori berdasarkan jenis unsur (Logam, Non-Logam, dll)
-        
-        def get_nano_properties(element):
-            # Kategori Logam Mulia (Ag, Au, Pt)
-            if element in ["Silver", "Gold", "Platinum"]:
-                return {
-                    "Hambat": "Sangat Tinggi (Interaksi ion permukaan dengan membran sel).",
-                    "Warna": "Berubah drastis (Efek LSPR - Surface Plasmon Resonance).",
-                    "Larut": "Dispersi koloid stabil, meningkatkan efektivitas dalam cairan."
-                }
-            # Kategori Logam Transisi / Nutrisi (Fe, Zn, Cu, Mg)
-            elif element in ["Iron", "Zinc", "Copper", "Magnesium", "Calcium"]:
-                return {
-                    "Hambat": "Moderat (Memicu ROS/Stres Oksidatif pada bakteri).",
-                    "Warna": "Lebih gelap/intens karena luas permukaan yang besar.",
-                    "Larut": "Bioavailabilitas meningkat drastis (Sangat mudah diserap tubuh)."
-                }
-            # Kategori Metaloid/Non-Logam (Si, C, Se)
-            elif element in ["Silicon", "Carbon", "Selenium"]:
-                return {
-                    "Hambat": "Spesifik (Bergantung pada modifikasi permukaan/fungsionalisasi).",
-                    "Warna": "Cenderung transparan atau hitam (bergantung pada struktur nano).",
-                    "Larut": "Daya ikat (adsorpsi) meningkat drastis."
-                }
-            # Default untuk unsur lainnya
-            else:
-                return {
-                    "Hambat": "Bergantung pada reaktivitas atom di permukaan.",
-                    "Warna": "Pergeseran spektrum cahaya akibat ukuran partikel.",
-                    "Larut": "Peningkatan kinetika pelarutan karena rasio luas permukaan."
-                }
-
-        sifat = get_nano_properties(pilihan_nano)
-        
-        # 4. Tampilan Kolom Sifat
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.info(f" **Daya Hambat**\n\n{sifat['Hambat']}")
-        with col2:
-            st.warning(f" **Warna**\n\n{sifat['Warna']}")
-        with col3:
-            st.success(f" **Kelarutan**\n\n{sifat['Larut']}")
-            
-    else:
-        st.info("📦 **Sifat Makro (Bulk):** Material masih berukuran besar. Geser slider di bawah 100 nm untuk melihat sifat spesifik nanometer.")
-    
-    st.markdown("</div>", unsafe_allow_html=True)
-    
     with tab3:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("### 🔬 Karakterisasi Nanomaterial")
-        st.write("Prediksi hasil analisis instrumen untuk 118 unsur dalam skala nano.")
-
-        # 1. Pilih Unsur & Metode Analisis
-        col_a, col_b = st.columns(2)
-        with col_a:
-            unsur_karak = st.selectbox("Pilih Unsur:", list(ELEMENTS.keys()), key="unsur_karak")
-        with col_b:
-            metode = st.selectbox("Pilih Instrumen:", ["SEM", "TEM", "AFM", "XRD", "FTIR", "UV-Vis"])
-
-        # 2. Logika Karakterisasi Otomatis (Berlaku untuk semua 118 unsur)
-        def dapatkan_hasil_karakterisasi(unsur, instrumen):
-            # Pengelompokan tipe unsur untuk akurasi data
-            logam = ["Gold", "Silver", "Copper", "Iron", "Zinc", "Nickel", "Platinum", "Aluminum"]
-            non_logam = ["Carbon", "Silicon", "Sulfur", "Phosphorus", "Selenium"]
-            
-            # Logika berdasarkan Instrumen
-            if instrumen == "SEM":
-                return "Morfologi permukaan terdeteksi. Terlihat agregasi partikel dan distribusi ukuran pada skala mikrometer hingga nanometer tinggi."
-            elif instrumen == "TEM":
-                return "Struktur internal dan kristalinitas terlihat jelas. Resolusi tinggi memungkinkan pengamatan bentuk partikel (spherical/rod) secara presisi."
-            elif instrumen == "AFM":
-                return "Topografi permukaan 3D dan kekasaran permukaan ($Roughness$) terukur dalam skala atomik."
-            elif instrumen == "XRD":
-                if unsur in logam:
-                    return "Puncak difraksi tajam (Bragg peaks) menunjukkan struktur kristal (FCC/BCC) yang sangat teratur."
-                else:
-                    return "Pola difraksi menunjukkan fasa amorf atau semi-kristalin bergantung pada metode sintesis."
-            elif instrumen == "FTIR":
-                return "Gugus fungsi pada permukaan terdeteksi. Menunjukkan interaksi antara partikel dengan agen penudung (*capping agent*)."
-            elif instrumen == "UV-Vis":
-                if unsur in ["Gold", "Silver"]:
-                    return "Terdeteksi puncak absorbansi spesifik akibat fenomena *Surface Plasmon Resonance* (SPR)."
-                else:
-                    return "Spektrum absorbansi menunjukkan nilai *Band Gap* energi yang bergeser ke arah biru (*blue shift*)."
-
-        # 3. Output Analisis
+        st.markdown("### 🧊 Model 3D Interaktif")
+        n_at = st.slider("Jumlah Atom:", 20, 100, 50)
+        phi = np.random.uniform(0, 2*np.pi, n_at)
+        costheta = np.random.uniform(-1, 1, n_at)
+        theta = np.arccos(costheta)
+        r = np.random.uniform(0, 1, n_at)**(1/3)
+        x = r * np.sin(theta) * np.cos(phi)
+        y = r * np.sin(theta) * np.sin(phi)
+        z = r * np.cos(theta)
+        fig_3d = go.Figure(data=[go.Scatter3d(x=x, y=y, z=z, mode='markers', marker=dict(size=8, color=r, colorscale='Viridis'))])
+        fig_3d.update_layout(margin=dict(l=0,r=0,b=0,t=0))
+        st.plotly_chart(fig_3d, use_container_width=True)
         st.markdown("---")
-        st.success(f"**Hasil Analisis {metode} untuk Nano-{unsur_karak}:**")
-        st.write(dapatkan_hasil_karakterisasi(unsur_karak, metode))
-        
-        # 4. Tambahan Visual Representasi (Simulasi Grafik)
-        if metode in ["XRD", "UV-Vis"]:
-            st.write("💡 *Simulasi Tren Grafik:*")
-            chart_data = pd.DataFrame(np.random.rand(10, 1), columns=['Intensity'])
-            st.line_chart(chart_data)
+        st.markdown("### 🎬 Animasi Sintesis")
 
-        st.markdown("</div>", unsafe_allow_html=True)
-        
-    with tab4:
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("### 🧊 3D Interaktif Nanopartikel")
-        st.write("Visualisasi model atom nanomaterial dengan kontrol rotasi 360 derajat.")
-        
-        # 1. Pilihan Unsur untuk Model 3D
-        unsur_3d = st.selectbox("Pilih Unsur Nanopartikel:", list(ELEMENTS.keys()), key="u_3d")
-    
-        # 2. Pengaturan Parameter Model
-        col_v1, col_v2 = st.columns(2)
-        with col_v1:
-            n_atoms = st.slider("Jumlah Atom dalam Cluster:", 10, 100, 50)
-        with col_v2:
-            cluster_type = st.radio("Bentuk Cluster:", ["Spherical (Bola)", "Cubic (Kubus)"])
-            
-        # 3. Logika Pembuatan Koordinat Atom
-        def generate_cluster(n, c_type):
-            if c_type == "Spherical (Bola)":
-                phi = np.random.uniform(0, 2*np.pi, n)
-                costheta = np.random.uniform(-1, 1, n)
-                u = np.random.uniform(0, 1, n)
-                theta = np.arccos(costheta)
-                r = 1.0 * np.power(u, 1/3)
-                x = r * np.sin(theta) * np.cos(phi)
-                y = r * np.sin(theta) * np.sin(phi)
-                z = r * np.cos(theta)
-            else: # Cubic
-                x = np.random.uniform(-0.7, 0.7, n)
-                y = np.random.uniform(-0.7, 0.7, n)
-                z = np.random.uniform(-0.7, 0.7, n)
-            return x, y, z
-        
-        x, y, z = generate_cluster(n_atoms, cluster_type)
-        
-        # 4. Rendering 3D menggunakan Plotly
-        fig = go.Figure(data=[go.Scatter3d(
-            x=x, y=y, z=z,
-            mode='markers',
-            marker=dict(
-                size=10,
-                color=x**2 + y**2 + z**2, # Warna gradien berdasarkan jarak dari pusat
-                colorscale='Viridis',
-                opacity=0.8,
-                line=dict(width=1, color='white')
-            )
-        )])
+        def create_nano_animation(method='bottomup'):
+            fig_anim, ax = plt.subplots(figsize=(6, 6))
+            ax.set_xlim(-10, 10)
+            ax.set_ylim(-10, 10)
+            if method == 'bottomup':
+                ax.set_title("Metode Bottom-Up: Nukleasi Atom")
+                particles, = ax.plot([], [], 'bo', markersize=4, alpha=0.6)
+                nucleus = plt.Circle((0, 0), 0, color='blue', alpha=0.4)
+                ax.add_patch(nucleus)
+                def animate(i):
+                    dist = max(0, 8 - i*0.15)
+                    angles = np.linspace(0, 2*np.pi, 20)
+                    ax_x = dist * np.cos(angles + i*0.1)
+                    ax_y = dist * np.sin(angles + i*0.1)
+                    particles.set_data(ax_x, ax_y)
+                    if i > 30:
+                        nucleus.set_radius(min(3, (i-30)*0.1))
+                    return particles, nucleus
+            else:
+                ax.set_title("Metode Top-Down: Fragmentasi Bulk")
+                bulk = plt.Circle((0, 0), 6, color='gray', alpha=0.5)
+                ax.add_patch(bulk)
+                shards, = ax.plot([], [], 'ko', markersize=2)
+                def animate(i):
+                    new_r = max(0.5, 6 - i*0.1)
+                    bulk.set_radius(new_r)
+                    if i > 5:
+                        num_shards = i * 2
+                        angles = np.random.uniform(0, 2*np.pi, num_shards)
+                        dists = np.random.uniform(new_r, 9)
+                        shards.set_data(dists * np.cos(angles), dists * np.sin(angles))
+                    return bulk, shards
+            ani = animation.FuncAnimation(fig_anim, animate, frames=60, interval=50, blit=True)
+            filename = f"sintesis_{method}.gif"
+            ani.save(filename, writer='pillow')
+            plt.close(fig_anim)
+            return filename
 
-        fig.update_layout(
-            scene=dict(
-                xaxis_title='X (nm)',
-                yaxis_title='Y (nm)',
-                zaxis_title='Z (nm)',
-                bgcolor="rgba(0,0,0,0)"
-            ),
-            margin=dict(l=0, r=0, b=0, t=0),
-            paper_bgcolor="rgba(0,0,0,0)"
-        )
-
-        # Menampilkan Plot Interaktif
-        st.plotly_chart(fig, use_container_width=True)
-    
-        st.info(f"💡 **Info Model:** Menampilkan struktur atom nano-cluster {unsur_3d}. Gunakan mouse/kursor untuk memutar gambar 360 derajat.")
+        if st.button("Generate Animasi Sintesis"):
+            with st.spinner("Membuat GIF..."):
+                gif_bu = create_nano_animation('bottomup')
+                gif_td = create_nano_animation('topdown')
+                col_gif1, col_gif2 = st.columns(2)
+                with col_gif1:
+                    st.image(gif_bu, caption="Proses Bottom-Up")
+                with col_gif2:
+                    st.image(gif_td, caption="Proses Top-Down")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    
+        
 
 elif menu == "👥 About":
-    # Bagian About untuk informasi penulis dan institusi
-    st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.subheader("👥 Tentang Aplikasi")
-    st.write("**NanoTools Pro** adalah aplikasi asisten laboratorium digital yang dirancang untuk memudahkan peneliti dan mahasiswa dalam kalkulasi kimia serta akses cepat terhadap keamanan bahan kimia (MSDS).")
+    st.markdown("## 👥 Tim Pengembang NanoTools")
+    st.markdown("<div class='card-header'>Tentang NanoTools</div>", unsafe_allow_html=True)
+    st.write("""
+    Website ini dikembangkan oleh mahasiswa prodi Nanoteknologi Pangan untuk mendigitalisasi 
+    perhitungan laboratorium dan mempermudah akses literatur nanoteknologi.
+    """)
     
-    st.markdown("---")
-    st.write("**Penulis:**")
-    st.write("👤 **Meutia Zulasfi**")
-    st.write("🆔 **NIM: 2420448**")
-    
-    st.markdown("---")
-    st.write("**Institusi:**")
-    st.info("Politeknik AKA Bogor - Program Studi Nanoteknologi Pangan")
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("### 🚀 Fitur Utama")
+    st.markdown("""
+    * **Simulasi Sintesis Nanopartikel**: *Visualisasi skema metode **Bottom-Up** dan **Top-Down** untuk membantu pemahaman mekanisme pembentukan partikel skala nano.*
+    * **Analisis Karakterisasi Digital**: *Modul bantu untuk mengolah data awal hasil karakterisasi laboratorium dengan standar komputasi yang akurat.*
+    * **Database Material Nano**: *Akses cepat ke referensi properti material nanomaterial pangan dan umum untuk mendukung studi literatur.*
+    * **Database MSDS**: *Penyediaan lembar data keselamatan bahan kimia (MSDS) untuk memastikan prosedur penanganan bahan di laboratorium dilakukan dengan aman dan sesuai standar K3.*
+    """)
 
-# Footer aplikasi
-st.markdown("<p style='text-align:center; color:white; font-size:0.8rem; margin-top:50px;'>All Rights Reserved © 2026 NanoTools Project</p>", unsafe_allow_html=True)
+    st.markdown("### Anggota Tim")
+    st.write("") # Spacer
+
+    # Membuat 4 kolom dalam 1 baris
+    col1, col2, col3, col4 = st.columns(4)
+
+    # PENULIS 1
+    with col1:
+        st.image("https://cdn-icons-png.flaticon.com/512/4140/4140048.png", use_container_width=True)
+        st.markdown("<p style='text-align: center; font-weight: bold; margin-bottom: 0;'>Fairuz Zuhria Chayara Alima</p>", unsafe_allow_html=True)
+        st.markdown("<center><span class='role-badge' style='font-size: 0.6rem;'>Penulis</span></center>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; font-size: 0.7rem; color: #666;'>NIM: 2450156</p>", unsafe_allow_html=True)
+
+    # PENULIS 2
+    with col2:
+        st.image("fotointann.jpeg", use_container_width=True)
+        st.markdown("<p style='text-align: center; font-weight: bold; margin-bottom: 0;'>Intan Nurul Hasanah</p>", unsafe_allow_html=True)
+        st.markdown("<center><span class='role-badge' style='font-size: 0.6rem;'>Penulis</span></center>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; font-size: 0.7rem; color: #666;'>NIM: 2450167</p>", unsafe_allow_html=True)
+
+    # PENULIS 3
+    with col3:
+        st.image("foto gue.jpeg", use_container_width=True)
+        st.markdown("<p style='text-align: center; font-weight: bold; margin-bottom: 0;'>Meuthia Zulashfi Rhohyan Syafrudin</p>", unsafe_allow_html=True)
+        st.markdown("<center><span class='role-badge' style='font-size: 0.6rem;'>Penulis</span></center>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; font-size: 0.7rem; color: #666;'>NIM: 2450180</p>", unsafe_allow_html=True)
+
+    # PENULIS 4
+    with col4:
+        st.image("fotoniko.jpeg", use_container_width=True)
+        st.markdown("<p style='text-align: center; font-weight: bold; margin-bottom: 0;'>Nicholas Dimas Ananda</p>", unsafe_allow_html=True)
+        st.markdown("<center><span class='role-badge' style='font-size: 0.6rem;'>Penulis</span></center>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center; font-size: 0.7rem; color: #666;'>NIM: 2450197</p>", unsafe_allow_html=True)
+
+
+    # --- Info Instansi ---
+    st.markdown("---")
+    st.markdown("<h4 style='text-align: center; color: white;'>Politeknik AKA Bogor</h4>", unsafe_allow_html=True)
+
+
+# =============================
+# FOOTER
+# =============================
+st.markdown("<br><br>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; color: white; font-size: 0.8rem;'>Hak Cipta © 2025 NanoTools. All Rights Reserved.</p>", unsafe_allow_html=True)

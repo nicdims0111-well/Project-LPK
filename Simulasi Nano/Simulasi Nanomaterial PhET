@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>NanoSim: PhET-style Nanoparticle Synthesis</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body { margin: 0; font-family: sans-serif; background: #f0f0f0; display: flex; flex-direction: column; align-items: center; }
+        #controls { background: #2c3e50; color: white; padding: 20px; width: 100%; display: flex; gap: 20px; justify-content: center; }
+        canvas { border: 5px solid #bdc3c7; border-radius: 8px; margin-top: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .btn { padding: 10px; cursor: pointer; background: #3498db; color: white; border: none; border-radius: 4px; }
+        .btn:hover { background: #2980b9; }
+        .label { font-weight: bold; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+<div id="controls">
+    <div>
+        <span class="label">Pilih Metode:</span><br>
+        <button class="btn" onclick="setMode('topdown')">Top-Down (Milling)</button>
+        <button class="btn" onclick="setMode('bottomup')">Bottom-Up (Chemical)</button>
+    </div>
+    <div>
+        <span class="label">Energi / Konsentrasi:</span><br>
+        <input type="range" id="powerSlider" min="1" max="10" value="5">
+    </div>
+    <div>
+        <span class="label">Status:</span><br>
+        <div id="statusText">Ready</div>
+    </div>
+    <button class="btn" style="background:#e74c3c" onclick="resetSim()">Reset</button>
+</div>
+
+<script>
+let mode = 'topdown';
+let particles = [];
+let bulkMaterial;
+let power = 5;
+
+function setup() {
+    createCanvas(800, 500);
+    resetSim();
+}
+
+function setMode(m) {
+    mode = m;
+    resetSim();
+}
+
+function resetSim() {
+    particles = [];
+    if (mode === 'topdown') {
+        bulkMaterial = { x: width/2, y: height/2, r: 150 };
+        document.getElementById('statusText').innerText = "Top-Down: Klik Bulk untuk Menghancurkan";
+    } else {
+        document.getElementById('statusText').innerText = "Bottom-Up: Atom sedang bereaksi...";
+        // Generate atoms for bottom-up
+        for(let i=0; i<100; i++) {
+            particles.push(new Atom());
+        }
+    }
+}
+
+function draw() {
+    background(255);
+    power = document.getElementById('powerSlider').value;
+
+    if (mode === 'topdown') {
+        drawTopDown();
+    } else {
+        drawBottomUp();
+    }
+}
+
+// --- LOGIKA TOP-DOWN ---
+function drawTopDown() {
+    fill(127);
+    noStroke();
+    if (bulkMaterial.r > 20) {
+        ellipse(bulkMaterial.x, bulkMaterial.y, bulkMaterial.r);
+        if (mouseIsPressed && dist(mouseX, mouseY, bulkMaterial.x, bulkMaterial.y) < bulkMaterial.r/2) {
+            bulkMaterial.r -= 0.5 * power;
+            for(let i=0; i<power; i++) {
+                particles.push(new NanoParticle(bulkMaterial.x, bulkMaterial.y, 'gray'));
+            }
+        }
+    }
+    particles.forEach((p, index) => {
+        p.update();
+        p.show();
+        if (p.isOffScreen()) particles.splice(index, 1);
+    });
+}
+
+// --- LOGIKA BOTTOM-UP ---
+function drawBottomUp() {
+    particles.forEach(p => {
+        p.attractToCenter();
+        p.update();
+        p.show();
+    });
+    
+    // Titik Nukleasi
+    fill(52, 152, 219, 150);
+    let size = map(particles.filter(p => p.atCenter).length, 0, 100, 0, 120);
+    ellipse(width/2, height/2, size);
+}
+
+// --- CLASS PARTIKEL ---
+class NanoParticle {
+    constructor(x, y, col) {
+        this.pos = createVector(x, y);
+        this.vel = p5.Vector.random2D().mult(random(1, 4));
+        this.col = col;
+    }
+    update() { this.pos.add(this.vel); }
+    show() { fill(this.col); ellipse(this.pos.x, this.pos.y, 8); }
+    isOffScreen() { return (this.pos.x < 0 || this.pos.x > width || this.pos.y < 0 || this.pos.y > height); }
+}
+
+class Atom {
+    constructor() {
+        this.pos = createVector(random(width), random(height));
+        this.vel = p5.Vector.random2D();
+        this.atCenter = false;
+    }
+    attractToCenter() {
+        let center = createVector(width/2, height/2);
+        let dir = p5.Vector.sub(center, this.pos);
+        if (dir.mag() < 10) {
+            this.atCenter = true;
+            this.pos = center;
+        } else {
+            dir.setMag(0.05 * power);
+            this.vel.add(dir);
+        }
+    }
+    update() { if (!this.atCenter) this.pos.add(this.vel); }
+    show() { fill(this.atCenter ? 'blue' : 'rgba(52, 152, 219, 0.5)'); ellipse(this.pos.x, this.pos.y, 6); }
+}
+</script>
+</body>
+</html>
