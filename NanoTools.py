@@ -445,7 +445,7 @@ elif menu == "🔬 Lab Nanoteknologi":
 elif menu == "🛠 Tools":
     st.subheader("🛠 Integrated Safety Tools")
     # Existing Tools content (kept as in original file)...
-    tab1, tab2, tab3= st.tabs(["Tabel MSDS 118 Unsur", "Sifat Nanomaterial","Model"])
+    tab1, tab2, tab3= st.tabs(["Tabel MSDS 118 Unsur", "Sifat Nanomaterial"])
     
     with tab1:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
@@ -506,73 +506,6 @@ elif menu == "🛠 Tools":
         else:
             st.info("📦 *Sifat Makro (Bulk):* Material masih berukuran besar. Geser slider di bawah 100 nm untuk melihat sifat spesifik nanometer.")
         st.markdown("</div>", unsafe_allow_html=True)
-        
-    with tab3:
-        st.markdown("<div class='card'>", unsafe_allow_html=True)
-        st.markdown("### 🧊 Model 3D Interaktif")
-        n_at = st.slider("Jumlah Atom:", 20, 100, 50)
-        phi = np.random.uniform(0, 2*np.pi, n_at)
-        costheta = np.random.uniform(-1, 1, n_at)
-        theta = np.arccos(costheta)
-        r = np.random.uniform(0, 1, n_at)**(1/3)
-        x = r * np.sin(theta) * np.cos(phi)
-        y = r * np.sin(theta) * np.sin(phi)
-        z = r * np.cos(theta)
-        fig_3d = go.Figure(data=[go.Scatter3d(x=x, y=y, z=z, mode='markers', marker=dict(size=8, color=r, colorscale='Viridis'))])
-        fig_3d.update_layout(margin=dict(l=0,r=0,b=0,t=0))
-        st.plotly_chart(fig_3d, use_container_width=True)
-        st.markdown("---")
-        st.markdown("### 🎬 Animasi Sintesis")
-
-        def create_nano_animation(method='bottomup'):
-            fig_anim, ax = plt.subplots(figsize=(6, 6))
-            ax.set_xlim(-10, 10)
-            ax.set_ylim(-10, 10)
-            if method == 'bottomup':
-                ax.set_title("Metode Bottom-Up: Nukleasi Atom")
-                particles, = ax.plot([], [], 'bo', markersize=4, alpha=0.6)
-                nucleus = plt.Circle((0, 0), 0, color='blue', alpha=0.4)
-                ax.add_patch(nucleus)
-                def animate(i):
-                    dist = max(0, 8 - i*0.15)
-                    angles = np.linspace(0, 2*np.pi, 20)
-                    ax_x = dist * np.cos(angles + i*0.1)
-                    ax_y = dist * np.sin(angles + i*0.1)
-                    particles.set_data(ax_x, ax_y)
-                    if i > 30:
-                        nucleus.set_radius(min(3, (i-30)*0.1))
-                    return particles, nucleus
-            else:
-                ax.set_title("Metode Top-Down: Fragmentasi Bulk")
-                bulk = plt.Circle((0, 0), 6, color='gray', alpha=0.5)
-                ax.add_patch(bulk)
-                shards, = ax.plot([], [], 'ko', markersize=2)
-                def animate(i):
-                    new_r = max(0.5, 6 - i*0.1)
-                    bulk.set_radius(new_r)
-                    if i > 5:
-                        num_shards = i * 2
-                        angles = np.random.uniform(0, 2*np.pi, num_shards)
-                        dists = np.random.uniform(new_r, 9)
-                        shards.set_data(dists * np.cos(angles), dists * np.sin(angles))
-                    return bulk, shards
-            ani = animation.FuncAnimation(fig_anim, animate, frames=60, interval=50, blit=True)
-            filename = f"sintesis_{method}.gif"
-            ani.save(filename, writer='pillow')
-            plt.close(fig_anim)
-            return filename
-
-        if st.button("Generate Animasi Sintesis"):
-            with st.spinner("Membuat GIF..."):
-                gif_bu = create_nano_animation('bottomup')
-                gif_td = create_nano_animation('topdown')
-                col_gif1, col_gif2 = st.columns(2)
-                with col_gif1:
-                    st.image(gif_bu, caption="Proses Bottom-Up")
-                with col_gif2:
-                    st.image(gif_td, caption="Proses Top-Down")
-        st.markdown("</div>", unsafe_allow_html=True)
-
         
 
 elif menu == "👥 About":
