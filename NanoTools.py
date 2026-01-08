@@ -445,7 +445,7 @@ elif menu == "🔬 Lab Nanoteknologi":
 elif menu == "🛠 Tools":
     st.subheader("🛠 Integrated Safety Tools")
     # Existing Tools content (kept as in original file)...
-    tab1, tab2, tab3= st.tabs(["Tabel MSDS 118 Unsur", "Sifat Nanomaterial"])
+    tab1, tab2= st.tabs(["Tabel MSDS 118 Unsur", "Sifat Nanomaterial"])
     
     with tab1:
         st.markdown("<div class='card'>", unsafe_allow_html=True)
